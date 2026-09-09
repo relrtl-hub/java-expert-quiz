@@ -1,0 +1,127 @@
+{
+  "version": 1,
+  "source": "javexp",
+  "contract": "A subject slug is stable, lowercase, and is passed as ?subject=<slug> from Java Atlas to the quiz.",
+  "subjects": [
+    {
+      "slug": "java-memory-model",
+      "title": "Java Memory Model",
+      "categoryId": "java-runtime"
+    },
+    {
+      "slug": "collections-and-generics",
+      "title": "Collections and Generics",
+      "categoryId": "collections-caching"
+    },
+    {
+      "slug": "streams-and-modern-java",
+      "title": "Streams and Modern Java",
+      "categoryId": "modern-java"
+    },
+    {
+      "slug": "java-exceptions-and-error-handling",
+      "title": "Exceptions and Error Handling",
+      "categoryId": "error-handling"
+    },
+    {
+      "slug": "completable-future",
+      "title": "CompletableFuture",
+      "categoryId": "concurrency"
+    },
+    {
+      "slug": "java-rest-clients",
+      "title": "REST Clients",
+      "categoryId": "api-clients"
+    },
+    {
+      "slug": "equals-and-hashcode",
+      "title": "equals and hashCode",
+      "categoryId": "java-runtime"
+    },
+    {
+      "slug": "sliding-window",
+      "title": "Sliding Window",
+      "categoryId": "algorithms"
+    },
+    {
+      "slug": "kafka",
+      "title": "Kafka",
+      "categoryId": "backend-tools"
+    },
+    {
+      "slug": "redis",
+      "title": "Redis under the hood",
+      "categoryId": "data-services"
+    },
+    {
+      "slug": "lru-cache",
+      "title": "LRU Cache",
+      "categoryId": "collections-caching"
+    },
+    {
+      "slug": "lfu-cache",
+      "title": "LFU Cache",
+      "categoryId": "collections-caching"
+    },
+    {
+      "slug": "race-condition",
+      "title": "Race Condition",
+      "categoryId": "concurrency"
+    },
+    {
+      "slug": "junit",
+      "title": "JUnit",
+      "categoryId": "testing-engineering"
+    },
+    {
+      "slug": "testcontainers",
+      "title": "Testcontainers",
+      "categoryId": "testing-engineering"
+    },
+    {
+      "slug": "rate-limiter",
+      "title": "Rate Limiter",
+      "categoryId": "system-design"
+    },
+    {
+      "slug": "circuit-breaker",
+      "title": "Circuit Breaker",
+      "categoryId": "system-design"
+    },
+    {
+      "slug": "virtual-threads",
+      "title": "Virtual Threads",
+      "categoryId": "concurrency"
+    },
+    {
+      "slug": "reactor",
+      "title": "Project Reactor",
+      "categoryId": "concurrency"
+    },
+    {
+      "slug": "kubernetes-components",
+      "title": "Kubernetes components",
+      "categoryId": "kubernetes"
+    },
+    {
+      "slug": "docker-components",
+      "title": "Docker components and image flow",
+      "categoryId": "containers-git-architecture"
+    },
+    {
+      "slug": "apache-flink",
+      "title": "Apache Flink",
+      "categoryId": "backend-tools"
+    },
+    {
+      "slug": "clickhouse",
+      "title": "ClickHouse",
+      "categoryId": "data-services"
+    },
+    {
+      "slug": "jvm-internals-and-gc",
+      "title": "JVM internals and garbage collection",
+      "categoryId": "jvm-internals"
+    }
+  ]
+}

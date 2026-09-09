@@ -1,0 +1,10 @@
+{
+  "name": "java-expert-the-quiz",
+  "version": "0.1.0",
+  "private": true,
+  "description": "A small, source-backed Java interview quiz for the javexp subjects.",
+  "scripts": {
+    "test": "node --test tests/quiz-contract.test.js runner/tests/runner-contract.test.js",
+    "check": "npm test"
+  }
+}

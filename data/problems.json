@@ -1,0 +1,253 @@
+[
+  {
+    "id": "longest-substring-without-repeating-characters",
+    "title": "Longest Substring Without Repeating Characters",
+    "difficulty": "medium",
+    "problemId": "longest-substring-without-repeating-characters",
+    "methodSignature": "public int lengthOfLongestSubstring(String s)",
+    "prompt": "Given a string s, return the length of the longest substring without repeating characters. A substring must use contiguous characters.",
+    "constraints": [
+      "0 <= s.length() <= 50,000",
+      "The input may contain spaces and ordinary Unicode Java chars."
+    ],
+    "starterCode": "class Solution {\n    public int lengthOfLongestSubstring(String s) {\n        return 0;\n    }\n}",
+    "samples": [
+      {
+        "input": "abcabcbb",
+        "expected": 3
+      },
+      {
+        "input": "bbbbb",
+        "expected": 1
+      }
+    ],
+    "points": 3,
+    "source": {
+      "label": "LeetCode 3",
+      "url": "https://leetcode.com/problems/longest-substring-without-repeating-characters/"
+    }
+  },
+  {
+    "id": "longest-palindromic-substring-length",
+    "title": "Longest Palindromic Substring Length",
+    "difficulty": "medium",
+    "problemId": "longest-palindromic-substring-length",
+    "methodSignature": "public int longestPalindromeLength(String s)",
+    "prompt": "Return the length of the longest palindromic substring in s.",
+    "constraints": [
+      "1 <= s.length() <= 1,000",
+      "The substring must be contiguous."
+    ],
+    "starterCode": "class Solution {\n    public int longestPalindromeLength(String s) {\n        return 0;\n    }\n}",
+    "samples": [
+      {
+        "input": "babad",
+        "expected": 3
+      },
+      {
+        "input": "cbbd",
+        "expected": 2
+      }
+    ],
+    "points": 3,
+    "source": {
+      "label": "LeetCode 5",
+      "url": "https://leetcode.com/problems/longest-palindromic-substring/"
+    }
+  },
+  {
+    "id": "decode-ways",
+    "title": "Decode Ways",
+    "difficulty": "medium",
+    "problemId": "decode-ways",
+    "methodSignature": "public int numDecodings(String s)",
+    "prompt": "Return the number of valid decodings for a digit string where 1 through 26 map to letters.",
+    "constraints": [
+      "1 <= s.length() <= 100",
+      "A zero is valid only as part of 10 or 20."
+    ],
+    "starterCode": "class Solution {\n    public int numDecodings(String s) {\n        return 0;\n    }\n}",
+    "samples": [
+      {
+        "input": "12",
+        "expected": 2
+      },
+      {
+        "input": "226",
+        "expected": 3
+      }
+    ],
+    "points": 3,
+    "source": {
+      "label": "LeetCode 91",
+      "url": "https://leetcode.com/problems/decode-ways/"
+    }
+  },
+  {
+    "id": "first-unique-character",
+    "title": "First Unique Character",
+    "difficulty": "medium",
+    "problemId": "first-unique-character",
+    "methodSignature": "public int firstUniqChar(String s)",
+    "prompt": "Return the index of the first character that appears once, or -1 when every character repeats.",
+    "constraints": [
+      "1 <= s.length() <= 100,000",
+      "The input contains lowercase English letters."
+    ],
+    "starterCode": "class Solution {\n    public int firstUniqChar(String s) {\n        return -1;\n    }\n}",
+    "samples": [
+      {
+        "input": "leetcode",
+        "expected": 0
+      },
+      {
+        "input": "loveleetcode",
+        "expected": 2
+      }
+    ],
+    "points": 3,
+    "source": {
+      "label": "LeetCode 387",
+      "url": "https://leetcode.com/problems/first-unique-character-in-a-string/"
+    }
+  },
+  {
+    "id": "longest-valid-parentheses",
+    "title": "Longest Valid Parentheses",
+    "difficulty": "medium",
+    "problemId": "longest-valid-parentheses",
+    "methodSignature": "public int longestValidParentheses(String s)",
+    "prompt": "Return the length of the longest valid parentheses substring.",
+    "constraints": [
+      "1 <= s.length() <= 1,000",
+      "s contains only ( and )."
+    ],
+    "starterCode": "class Solution {\n    public int longestValidParentheses(String s) {\n        return 0;\n    }\n}",
+    "samples": [
+      {
+        "input": "(()",
+        "expected": 2
+      },
+      {
+        "input": ")()())",
+        "expected": 4
+      }
+    ],
+    "points": 3,
+    "source": {
+      "label": "LeetCode 32",
+      "url": "https://leetcode.com/problems/longest-valid-parentheses/"
+    }
+  },
+  {
+    "id": "minimum-add-parentheses",
+    "title": "Minimum Add to Make Parentheses Valid",
+    "difficulty": "medium",
+    "problemId": "minimum-add-parentheses",
+    "methodSignature": "public int minAddToMakeValid(String s)",
+    "prompt": "Return the minimum additions needed to make the parentheses string valid.",
+    "constraints": [
+      "1 <= s.length() <= 1,000",
+      "s contains only ( and )."
+    ],
+    "starterCode": "class Solution {\n    public int minAddToMakeValid(String s) {\n        return 0;\n    }\n}",
+    "samples": [
+      {
+        "input": "())",
+        "expected": 1
+      },
+      {
+        "input": "(((",
+        "expected": 3
+      }
+    ],
+    "points": 3,
+    "source": {
+      "label": "LeetCode 921",
+      "url": "https://leetcode.com/problems/minimum-add-to-make-parentheses-valid/"
+    }
+  },
+  {
+    "id": "count-palindromic-substrings",
+    "title": "Count Palindromic Substrings",
+    "difficulty": "medium",
+    "problemId": "count-palindromic-substrings",
+    "methodSignature": "public int countSubstrings(String s)",
+    "prompt": "Return the number of contiguous palindromic substrings.",
+    "constraints": [
+      "1 <= s.length() <= 1,000"
+    ],
+    "starterCode": "class Solution {\n    public int countSubstrings(String s) {\n        return 0;\n    }\n}",
+    "samples": [
+      {
+        "input": "abc",
+        "expected": 3
+      },
+      {
+        "input": "aaa",
+        "expected": 6
+      }
+    ],
+    "points": 3,
+    "source": {
+      "label": "LeetCode 647",
+      "url": "https://leetcode.com/problems/palindromic-substrings/"
+    }
+  },
+  {
+    "id": "longest-consecutive-run",
+    "title": "Longest Consecutive Run",
+    "difficulty": "medium",
+    "problemId": "longest-consecutive-run",
+    "methodSignature": "public int longestConsecutive(String csv)",
+    "prompt": "The input is a comma-separated integer list. Return the longest consecutive-value run.",
+    "constraints": [
+      "The input contains at least one integer.",
+      "Values may be repeated and may be negative."
+    ],
+    "starterCode": "class Solution {\n    public int longestConsecutive(String csv) {\n        return 0;\n    }\n}",
+    "samples": [
+      {
+        "input": "100,4,200,1,3,2",
+        "expected": 4
+      },
+      {
+        "input": "0,3,7,2,5,8,4,6,0,1",
+        "expected": 9
+      }
+    ],
+    "points": 3,
+    "source": {
+      "label": "LeetCode 128",
+      "url": "https://leetcode.com/problems/longest-consecutive-sequence/"
+    }
+  },
+  {
+    "id": "max-repeating-window",
+    "title": "Longest Repeating Character Replacement",
+    "difficulty": "medium",
+    "problemId": "max-repeating-window",
+    "methodSignature": "public int characterReplacement(String encoded)",
+    "prompt": "The input is encoded as s|k. Return the longest uniform window after at most k replacements.",
+    "constraints": [
+      "The string part contains uppercase English letters.",
+      "k is a non-negative integer."
+    ],
+    "starterCode": "class Solution {\n    public int characterReplacement(String encoded) {\n        return 0;\n    }\n}",
+    "samples": [
+      {
+        "input": "ABAB|2",
+        "expected": 4
+      },
+      {
+        "input": "AABABBA|1",
+        "expected": 4
+      }
+    ],
+    "points": 3,
+    "source": {
+      "label": "LeetCode 424",
+      "url": "https://leetcode.com/problems/longest-repeating-character-replacement/"
+    }
+  }
+]

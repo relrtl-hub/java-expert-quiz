@@ -1,0 +1,14 @@
+{
+  "id": "longest-substring-without-repeating-characters",
+  "title": "Longest Substring Without Repeating Characters",
+  "className": "Solution",
+  "methodName": "lengthOfLongestSubstring",
+  "language": "java",
+  "languageId": 62,
+  "points": 3,
+  "samples": [
+    { "input": "abcabcbb", "expected": 3 },
+    { "input": "bbbbb", "expected": 1 }
+  ],
+  "hiddenTests": []
+}

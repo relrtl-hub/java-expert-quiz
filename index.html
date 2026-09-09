@@ -1,0 +1,98 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content="A small, source-backed Java interview quiz for javexp subjects." />
+    <meta name="quiz-runner-url" content="http://127.0.0.1:8787" />
+    <title>Java Expert · The Quiz</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <header class="site-header">
+      <div class="header-inner">
+        <a class="brand" href="./" aria-label="Java Expert The Quiz home">
+          <span class="brand-mark">JX</span>
+          <span><strong>JAVA EXPERT</strong><small>THE QUIZ</small></span>
+        </a>
+        <span class="header-actions"><a class="return-link" id="return-javexp" href="https://relrtl-hub.github.io/javexp/">← Return to javexp</a><span class="header-note">Practice the mechanism, not the trivia.</span></span>
+      </div>
+    </header>
+
+    <main class="page-shell">
+      <section class="hero">
+        <div>
+          <p class="eyebrow">v1 · static practice mode</p>
+          <h1>Interview questions with receipts.</h1>
+          <p class="hero-copy">A small quiz drawn from public Java interview material and mapped to the subjects in <a href="https://github.com/relrtl-hub/javexp" target="_blank" rel="noreferrer">javexp</a>. No account, no mysterious scoring oracle. The bank can use local JSON or an optional Supabase project.</p>
+        </div>
+        <div class="hero-stamp"><span>LOCAL</span><strong>FIRST</strong><small>answers stay in this browser</small></div>
+      </section>
+
+      <section class="panel config-panel" aria-labelledby="config-title">
+        <div class="section-heading">
+          <div><p class="eyebrow">01 / configure</p><h2 id="config-title">Build a small test</h2></div>
+          <span class="bank-status"><span class="pill" id="bank-size">137 questions loaded</span><small id="bank-source">Loading question bank…</small></span>
+        </div>
+        <div class="config-grid">
+          <label>
+            <span>Specific subject</span>
+            <select id="subject-filter">
+              <option value="all">All subjects</option>
+            </select>
+          </label>
+          <label>
+            <span>Subject area</span>
+            <select id="category-filter">
+              <option value="all">All mapped javexp subjects</option>
+            </select>
+          </label>
+          <label>
+            <span>Question type</span>
+            <select id="question-type">
+              <option value="mixed">Mixed practice</option>
+              <option value="multiple_choice">Multiple-choice only</option>
+              <option value="short_answer">Short answer only</option>
+              <option value="leetcode">LeetCode only</option>
+            </select>
+          </label>
+          <label>
+            <span>Questions</span>
+            <input id="question-count" type="number" min="1" max="137" value="10" />
+          </label>
+          <label class="check-row">
+            <input id="include-leetcode" type="checkbox" checked />
+            <span>Include one medium LeetCode slot</span>
+          </label>
+        </div>
+        <div class="composition" id="composition" aria-live="polite">10 questions · 7 multiple-choice · 2 short answer · 1 coding problem</div>
+        <div class="config-actions"><button class="primary-button" id="generate-test" type="button">Generate test <span>→</span></button><button class="secondary-button" id="fixed-test" type="button">10 short + 1 coding test</button></div>
+        <p class="microcopy">Default test: 10 questions, mostly multiple-choice, plus 2 short answers and 1 randomly selected medium coding problem. The separate fixed mode keeps the 10-short-plus-1-coding format.</p>
+      </section>
+
+      <div id="notification" class="notification" role="status" aria-live="polite" hidden></div>
+      <div id="subject-context" class="notification subject-context" role="status" aria-live="polite" hidden></div>
+
+      <section id="quiz-section" class="quiz-section" aria-labelledby="quiz-title" hidden>
+        <div class="section-heading quiz-heading">
+          <div><p class="eyebrow">02 / answer</p><h2 id="quiz-title">Your test</h2></div>
+          <span class="pill" id="progress-pill">0 / 0</span>
+        </div>
+        <p class="scoring-note">Multiple-choice questions use exact answers, short answers use concept rubrics, and coding problems are checked by the stateless Java runner. The quiz falls back to local JSON when Supabase is not configured.</p>
+        <form id="quiz-form"></form>
+        <button class="primary-button" id="submit-test" type="submit" form="quiz-form">Submit and reveal explanations <span>→</span></button>
+      </section>
+
+      <section id="results" class="results panel" aria-labelledby="results-title" hidden></section>
+
+      <section class="suggestions panel" aria-labelledby="suggestions-title">
+        <div class="section-heading"><div><p class="eyebrow">03 / expand javexp</p><h2 id="suggestions-title">A likely next area</h2></div><span class="pill">candidate</span></div>
+        <div id="suggestion-list"></div>
+      </section>
+    </main>
+
+    <footer class="site-footer"><span>Java Expert · The Quiz</span><span>Static MVP · browser-local progress</span></footer>
+    <script src="supabase/config.js" defer></script>
+    <script src="app.js" defer></script>
+  </body>
+</html>

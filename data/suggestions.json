@@ -1,0 +1,58 @@
+[
+  {
+    "title": "JPA, Hibernate, and transaction boundaries",
+    "reason": "The current javexp catalog covers Java, concurrency, data systems, REST clients, testing, and system design, but not the ORM and transaction behavior that appears frequently in backend Java interviews.",
+    "candidateSubjects": [
+      "Persistence context and entity lifecycle",
+      "Lazy loading and the N+1 query problem",
+      "Transaction propagation and isolation",
+      "Optimistic versus pessimistic locking"
+    ],
+    "source": {
+      "label": "Baeldung: Hibernate entity lifecycle",
+      "url": "https://baeldung.com/hibernate-entity-lifecycle"
+    }
+  },
+  {
+    "title": "JVM internals and garbage collection",
+    "reason": "A deeper JVM subject would connect the existing Java runtime material to class loading, JIT compilation, heap allocation, garbage collection, and production diagnostics.",
+    "candidateSubjects": [
+      "Class loading and initialization",
+      "JIT compilation and deoptimization",
+      "Heap generations and garbage collectors",
+      "GC logs, pauses, and memory pressure"
+    ],
+    "source": {
+      "label": "Oracle Java Virtual Machine Guide",
+      "url": "https://docs.oracle.com/en/java/javase/21/gctuning/"
+    }
+  },
+  {
+    "title": "JUnit and Testcontainers",
+    "reason": "The catalog has testing subjects but the quiz has no testing questions yet. This area would connect unit assertions with realistic dependency-backed integration tests.",
+    "candidateSubjects": [
+      "JUnit 5 test lifecycle",
+      "Parameterized tests and test data",
+      "Testcontainers database tests",
+      "Unit, integration, and contract-test boundaries"
+    ],
+    "source": {
+      "label": "JUnit 5 User Guide",
+      "url": "https://docs.junit.org/5.10.0/user-guide/"
+    }
+  },
+  {
+    "title": "Spring dependency injection and application context",
+    "reason": "Spring appears throughout backend Java interviews, but the current catalog does not yet explain how the application context creates, wires, scopes, and manages components.",
+    "candidateSubjects": [
+      "Bean discovery and component scanning",
+      "Constructor injection",
+      "Bean scopes and lifecycle",
+      "Configuration boundaries and testing"
+    ],
+    "source": {
+      "label": "Spring Framework: Core technologies",
+      "url": "https://docs.spring.io/spring-framework/reference/core.html"
+    }
+  }
+]
