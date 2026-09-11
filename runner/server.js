@@ -32,24 +32,49 @@ function javaString(value) {
 function buildSubmissionSource(problem, sourceCode, mode) {
   const solution = sourceCode.replace(/\bpublic\s+class\s+Solution\b/, `class ${problem.className}`)
   const cases = mode === 'sample' ? problem.samples : [...problem.samples, ...problem.hiddenTests]
-  const checks = cases.map((testCase, index) => `    check(solution, ${javaString(testCase.input)}, ${testCase.expected}, ${index});`).join('\n')
-  return `import java.util.*;\n\n${solution}\n\npublic class Main {\n  public static void main(String[] args) {\n    ${problem.className} solution = new ${problem.className}();\n${checks}\n  }\n\n  private static void check(${problem.className} solution, String input, int expected, int index) {\n    int actual = solution.${problem.methodName}(input);\n    if (actual != expected) {\n      System.out.println("WRONG_ANSWER|" + index);\n      System.exit(42);\n    }\n    System.out.println("PASS|" + index);\n  }\n}\n`
+  const checks = cases.map((testCase, index) => `    failed |= check(solution, ${javaString(testCase.input)}, ${testCase.expected}, ${index});`).join('\n')
+  return `import java.util.*;\n\n${solution}\n\npublic class Main {\n  public static void main(String[] args) {\n    ${problem.className} solution = new ${problem.className}();\n    boolean failed = false;\n${checks}\n    if (failed) System.exit(42);\n  }\n\n  private static boolean check(${problem.className} solution, String input, int expected, int index) {\n    int actual = solution.${problem.methodName}(input);\n    System.out.println("RESULT|" + index + "|" + actual);\n    if (actual != expected) {\n      System.out.println("WRONG_ANSWER|" + index);\n      return true;\n    }\n    System.out.println("PASS|" + index);\n    return false;\n  }\n}\n`
 }
 
 function outputPassCount(stdout = '') {
   return String(stdout).split(/\r?\n/).filter((line) => line.startsWith('PASS|')).length
 }
 
+function outputCaseResults(stdout = '') {
+  return new Map(String(stdout).split(/\r?\n/).flatMap((line) => {
+    const match = line.match(/^RESULT\|(\d+)\|(-?\d+)$/)
+    return match ? [[Number(match[1]), Number(match[2])]] : []
+  }))
+}
+
 function gradeExecution(problem, execution, mode) {
   const total = mode === 'sample' ? problem.samples.length : problem.samples.length + problem.hiddenTests.length
   const passed = outputPassCount(execution.stdout)
+  const actualByIndex = outputCaseResults(execution.stdout)
+  const examples = problem.samples.map((testCase, index) => {
+    const actual = actualByIndex.get(index)
+    return {
+      index: index + 1,
+      input: testCase.input,
+      expected: testCase.expected,
+      actual: actual === undefined ? null : actual,
+      passed: actual === testCase.expected,
+    }
+  })
+  const publicPassed = examples.filter((example) => example.passed).length
+  const withExamples = (result) => ({ ...result, examples })
   const description = execution.status?.description || ''
-  if (execution.compile_output) return { status: 'compile_error', passed, total, message: 'Compilation failed.' }
-  if (/time limit/i.test(description)) return { status: 'timeout', passed, total, message: 'The solution exceeded the time limit.' }
-  if (execution.stderr && !/accepted/i.test(description)) return { status: 'runtime_error', passed, total, message: 'The solution raised a runtime error.' }
-  if (/wrong answer/i.test(description) || String(execution.stdout || '').includes('WRONG_ANSWER')) return { status: 'wrong_answer', passed, total, message: 'The solution failed one or more tests.' }
-  if (/accepted/i.test(description) || passed === total) return { status: 'accepted', passed: total, total, message: mode === 'sample' ? 'All sample tests passed.' : 'All public and hidden tests passed.' }
-  return { status: 'runtime_error', passed, total, message: 'The runner did not return a complete result.' }
+  if (execution.compile_output) return withExamples({ status: 'compile_error', passed, total, message: 'Compilation failed.' })
+  if (/time limit/i.test(description)) return withExamples({ status: 'timeout', passed, total, message: 'The solution exceeded the time limit.' })
+  if (execution.stderr && !/accepted/i.test(description)) return withExamples({ status: 'runtime_error', passed, total, message: 'The solution raised a runtime error.' })
+  if (/wrong answer/i.test(description) || String(execution.stdout || '').includes('WRONG_ANSWER')) {
+    const message = publicPassed === examples.length && total > examples.length
+      ? 'All public examples passed, but one or more hidden tests failed.'
+      : 'The solution failed one or more tests.'
+    return withExamples({ status: 'wrong_answer', passed, total, message })
+  }
+  if (/accepted/i.test(description) || passed === total) return withExamples({ status: 'accepted', passed: total, total, message: mode === 'sample' ? 'All sample tests passed.' : 'All public and hidden tests passed.' })
+  return withExamples({ status: 'runtime_error', passed, total, message: 'The runner did not return a complete result.' })
 }
 
 function runLocally(problem, sourceCode, mode) {

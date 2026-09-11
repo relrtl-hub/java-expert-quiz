@@ -16,6 +16,7 @@ test('builds a Java harness around the submitted solution and keeps hidden cases
   assert.match(source, /class Solution/)
   assert.match(source, /public class Main/)
   assert.match(source, /lengthOfLongestSubstring/)
+  assert.match(source, /RESULT\|/)
   assert.match(source, /abcabcbb/)
   assert.doesNotMatch(source, /pwwkew/)
 })
@@ -23,15 +24,25 @@ test('builds a Java harness around the submitted solution and keeps hidden cases
 test('normalizes accepted, wrong-answer, compile, and runtime results', () => {
   const problem = loadProblem('longest-substring-without-repeating-characters')
 
-  assert.deepEqual(gradeExecution(problem, { status: { description: 'Accepted' }, stdout: 'PASS\nPASS\n' }, 'sample'), {
-    status: 'accepted',
-    passed: 2,
-    total: 2,
-    message: 'All sample tests passed.',
-  })
+  const accepted = gradeExecution(problem, { status: { description: 'Accepted' }, stdout: 'RESULT|0|3\nPASS|0\nRESULT|1|1\nPASS|1\n' }, 'sample')
+  assert.equal(accepted.status, 'accepted')
+  assert.deepEqual(accepted.examples, [
+    { index: 1, input: 'abcabcbb', expected: 3, actual: 3, passed: true },
+    { index: 2, input: 'bbbbb', expected: 1, actual: 1, passed: true },
+  ])
+  assert.equal(gradeExecution(problem, { status: { description: 'Wrong Answer' }, stdout: 'RESULT|0|2\nWRONG_ANSWER|0\n' }, 'sample').examples[0].actual, 2)
   assert.equal(gradeExecution(problem, { status: { description: 'Wrong Answer' }, stdout: 'PASS\nWRONG_ANSWER\n' }, 'submit').status, 'wrong_answer')
   assert.equal(gradeExecution(problem, { compile_output: 'error: missing ;' }, 'submit').status, 'compile_error')
   assert.equal(gradeExecution(problem, { stderr: 'Exception in thread main' }, 'submit').status, 'runtime_error')
+})
+
+test('does not expose hidden test inputs in public example results', () => {
+  const problem = loadProblem('longest-substring-without-repeating-characters')
+  const result = gradeExecution(problem, { status: { description: 'Wrong Answer' }, stdout: 'RESULT|0|3\nPASS|0\nRESULT|1|1\nPASS|1\nRESULT|2|0\nWRONG_ANSWER|2\n' }, 'submit')
+
+  assert.equal(result.examples.length, problem.samples.length)
+  assert.deepEqual(result.examples.map((example) => example.input), problem.samples.map((sample) => sample.input))
+  assert.doesNotMatch(JSON.stringify(result), /pwwkew/)
 })
 
 test('rejects unknown problems and oversized source before execution', () => {

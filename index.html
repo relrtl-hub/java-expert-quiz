@@ -32,7 +32,7 @@
       <section class="panel config-panel" aria-labelledby="config-title">
         <div class="section-heading">
           <div><p class="eyebrow">01 / configure</p><h2 id="config-title">Build a small test</h2></div>
-          <span class="bank-status"><span class="pill" id="bank-size">137 questions loaded</span><small id="bank-source">Loading question bank…</small></span>
+          <span class="bank-status"><span class="pill" id="bank-size">Loading question bank…</span><small id="bank-source">Loading question bank…</small></span>
         </div>
         <div class="config-grid">
           <label>
@@ -58,7 +58,7 @@
           </label>
           <label>
             <span>Questions</span>
-            <input id="question-count" type="number" min="1" max="137" value="10" />
+            <input id="question-count" type="number" min="1" max="10000" value="10" />
           </label>
           <label class="check-row">
             <input id="include-leetcode" type="checkbox" checked />
@@ -78,7 +78,7 @@
           <div><p class="eyebrow">02 / answer</p><h2 id="quiz-title">Your test</h2></div>
           <span class="pill" id="progress-pill">0 / 0</span>
         </div>
-        <p class="scoring-note">Multiple-choice questions use exact answers, short answers use concept rubrics, and coding problems are checked by the stateless Java runner. The quiz falls back to local JSON when Supabase is not configured.</p>
+        <p class="scoring-note">Multiple-choice questions use exact answers, short answers use concept rubrics, and coding problems are checked by the stateless Java runner. Question feedback is optional and starts unselected; it is saved only in this browser. The quiz falls back to local JSON when Supabase is not configured.</p>
         <form id="quiz-form"></form>
         <button class="primary-button" id="submit-test" type="submit" form="quiz-form">Submit and reveal explanations <span>→</span></button>
       </section>

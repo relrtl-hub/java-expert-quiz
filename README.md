@@ -15,11 +15,12 @@ This first slice has no account system. It works without a database, and now has
 - The LeetCode question has a real Java editor workflow with public examples and server-side hidden tests.
 - The latest result is saved only in this browser's `localStorage`.
 - The suggestion area stores your Add subject / Not now decision in this browser's `localStorage`.
+- Each displayed question has optional Good / Bad / Need explanation feedback saved in this browser. Bad questions are excluded from future local quiz pools; good-question weighting and automatic replacement lookup remain future work.
 - `data/javexp-quiz-catalog.json` is the versioned subject-slug contract shared with `javexp`.
 - `SUPABASE_SETUP.md` documents the optional free hosted question bank, RLS schema, seed, and browser configuration.
 - Every question includes a public source link and a note explaining whether it is paraphrased or synthesized.
 
-The current bank contains 137 questions: 77 multiple-choice, 51 short-answer, and 9 medium coding questions, with at least five questions mapped to every current quiz subject. Coverage now includes Kafka, Redis, LRU/LFU caching, race conditions, JUnit, Testcontainers, rate limiting, circuit breakers, virtual threads, Project Reactor, Kubernetes, Docker, Apache Flink, ClickHouse, and JVM internals. The default interview test creates exactly 10 questions: 7 multiple-choice, 2 short answers, and 1 randomly rotated coding problem. A separate fixed mode creates 10 short-answer questions plus 1 coding problem. Coding prompts are original summaries linked to official LeetCode references and public CoderPad topic pages; the project does not copy CoderPad or LeetCode solutions. Coding keeps a higher 3-point weight; short answers use 2-point concept rubrics.
+The current bank contains 290 questions: 165 multiple-choice, 112 short-answer, and 13 medium coding questions. All 29 current quiz subjects have at least 10 questions, including Binary Trees, Graph Traversal, Recursion and Backtracking, Dynamic Programming, Kafka, Redis, LRU/LFU caching, race conditions, JUnit, Testcontainers, rate limiting, circuit breakers, virtual threads, Project Reactor, Kubernetes, OpenShift, Docker, Apache Flink, ClickHouse, and JVM internals. The default interview test creates exactly 10 questions: 7 multiple-choice, 2 short answers, and 1 randomly rotated coding problem. A separate fixed mode creates 10 short-answer questions plus 1 coding problem. Coding prompts are original summaries linked to official references; the project does not copy platform solutions. Coding uses transparent partial credit: 3 points for a full pass, 2 when public examples pass but hidden tests fail, 1 for partial execution, and 0 for compile/runtime failure. Short answers use 2-point concept rubrics.
 
 ## Database direction
 
@@ -60,6 +61,12 @@ Without `RUNNER_MODE=local`, it forwards a wrapped Java submission to Judge0 usi
 npm test
 node --check app.js
 node --check runner/server.js
+```
+
+To regenerate the bank and its public Supabase seed. The generator preserves existing questions and automatically adds enough source-backed questions to bring every catalog subject to at least 10:
+
+```bash
+npm run generate-bank
 ```
 
 ## GitHub Pages

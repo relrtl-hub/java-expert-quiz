@@ -32,16 +32,17 @@ test('the quiz shell exposes the configuration and submission contract', () => {
 test('the question bank contains an expanded source-backed practice bank', () => {
   const questions = JSON.parse(read('data/questions.json'))
 
-  assert.equal(questions.length, 137)
-  assert.equal(questions.filter((question) => question.type === 'multiple_choice').length, 77)
-  assert.equal(questions.filter((question) => question.type === 'short_answer').length, 51)
-  assert.equal(questions.filter((question) => question.type === 'leetcode').length, 9)
+  assert.ok(questions.length >= 250)
+  assert.ok(questions.filter((question) => question.type === 'multiple_choice').length >= 10)
+  assert.ok(questions.filter((question) => question.type === 'short_answer').length >= 10)
+  assert.ok(questions.filter((question) => question.type === 'leetcode').length >= 1)
   assert.ok(questions.filter((question) => question.type === 'short_answer').length >= 10)
   const subjectCounts = questions.reduce((counts, question) => {
     counts[question.subjectId] = (counts[question.subjectId] || 0) + 1
     return counts
   }, {})
-  for (const count of Object.values(subjectCounts)) assert.ok(count >= 5)
+  assert.equal(Object.keys(subjectCounts).length, 29)
+  for (const count of Object.values(subjectCounts)) assert.ok(count >= 10)
 
   for (const question of questions) {
     assert.ok(question.subjectId)
@@ -69,7 +70,7 @@ test('the javexp catalog contract uses the same stable slugs as quiz questions',
   const catalogBySlug = new Map(catalog.subjects.map((subject) => [subject.slug, subject]))
   assert.equal(catalog.version, 1)
   assert.equal(catalog.source, 'javexp')
-  for (const slug of ['kafka', 'redis', 'junit', 'testcontainers', 'virtual-threads', 'kubernetes-components']) assert.ok(catalogSlugs.has(slug), slug)
+  for (const slug of ['kafka', 'redis', 'junit', 'testcontainers', 'virtual-threads', 'kubernetes-components', 'openshift', 'binary-trees', 'graph-traversal', 'recursion-and-backtracking', 'dynamic-programming']) assert.ok(catalogSlugs.has(slug), slug)
   for (const question of questions) {
     assert.ok(catalogSlugs.has(question.subjectId), question.subjectId)
     assert.equal(catalogBySlug.get(question.subjectId).categoryId, question.categoryId)
@@ -96,9 +97,14 @@ test('the browser app owns the local no-database quiz flow', () => {
   assert.match(app, /<details class="review-item"/)
   assert.match(app, /state\.activeQuestions\.map\(reviewItemMarkup\)/)
   assert.match(app, /Further reading/)
-  assert.match(app, /details class="review-item" open/)
+  assert.match(app, /<details class="review-item"[^>]*open/)
   assert.match(app, /<summary>/)
   assert.match(app, /runCode/)
+  assert.match(app, /Public example results/)
+  assert.match(app, /function codingScore/)
+  assert.match(app, /coding points/)
+  assert.match(app, /Your result/)
+  assert.match(app, /No result/)
   assert.match(app, /data\/problems\.json/)
   assert.match(app, /data-code-action/)
   assert.match(app, /quiz-runner-url/)
@@ -121,17 +127,45 @@ test('the browser app owns the local no-database quiz flow', () => {
   assert.match(html, /supabase\/config\.js/)
   assert.match(html, /bank-source/)
   assert.match(html, /value="10"/)
+  assert.match(html, /max="10000"/)
+})
+
+test('question feedback is optional, browser-local, and part of result review', () => {
+  const app = read('app.js')
+
+  assert.match(app, /QUESTION_RATINGS_KEY/)
+  assert.match(app, /java-expert-question-ratings/)
+  assert.match(app, /java-expert-removed-questions/)
+  assert.match(app, /question-rating/)
+  assert.match(app, /data-rating=/)
+  assert.match(app, /good: 'Good'/)
+  assert.match(app, /bad: 'Bad'/)
+  assert.match(app, /need_explanation: 'Need explanation'/)
+  assert.match(app, /aria-pressed/)
+  assert.match(app, /rating === 'bad'/)
+  assert.match(app, /removedQuestionIds/)
+  assert.match(app, /available.*10|10.*available/)
+  assert.match(app, /need_explanation/)
+  assert.match(app, /More explanation requested/)
+  assert.match(app, /codeResults/)
+  assert.match(app, /state\.submitting/)
+  assert.match(app, /Run examples, then submit the quiz/)
+  assert.match(app, /review-item.*data-question-id/)
+
+  const html = read('index.html')
+  assert.match(html, /Question feedback/)
 })
 
 test('the optional Supabase question backend is read-only and seeded from the public bank', () => {
   const schema = read('supabase/schema.sql')
   const seed = read('supabase/seed.sql')
   const config = read('supabase/config.example.js')
+  const questions = JSON.parse(read('data/questions.json'))
 
   assert.match(schema, /enable row level security/)
   assert.match(schema, /published = true/)
   assert.match(schema, /revoke insert, update, delete/)
-  assert.equal((seed.match(/insert into public\.quiz_questions/g) || []).length, 137)
+  assert.equal((seed.match(/insert into public\.quiz_questions/g) || []).length, questions.length)
   assert.match(config, /supabaseAnonKey/)
   assert.doesNotMatch(config, /service_role/)
 })
@@ -140,6 +174,6 @@ test('the coding problem catalog covers every coding question', () => {
   const questions = JSON.parse(read('data/questions.json')).filter((question) => question.type === 'leetcode')
   const problems = JSON.parse(read('data/problems.json'))
   const problemIds = new Set(problems.map((problem) => problem.id))
-  assert.equal(problems.length, 9)
+  assert.equal(problems.length, 13)
   for (const question of questions) assert.ok(problemIds.has(question.problemId), question.problemId)
 })

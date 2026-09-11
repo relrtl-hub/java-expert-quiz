@@ -44,6 +44,26 @@
       "categoryId": "algorithms"
     },
     {
+      "slug": "binary-trees",
+      "title": "Binary Trees",
+      "categoryId": "algorithms"
+    },
+    {
+      "slug": "graph-traversal",
+      "title": "Graph Traversal",
+      "categoryId": "algorithms"
+    },
+    {
+      "slug": "recursion-and-backtracking",
+      "title": "Recursion and Backtracking",
+      "categoryId": "algorithms"
+    },
+    {
+      "slug": "dynamic-programming",
+      "title": "Dynamic Programming",
+      "categoryId": "algorithms"
+    },
+    {
       "slug": "kafka",
       "title": "Kafka",
       "categoryId": "backend-tools"
@@ -101,6 +121,11 @@
     {
       "slug": "kubernetes-components",
       "title": "Kubernetes components",
+      "categoryId": "kubernetes"
+    },
+    {
+      "slug": "openshift",
+      "title": "OpenShift",
       "categoryId": "kubernetes"
     },
     {

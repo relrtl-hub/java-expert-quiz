@@ -5,6 +5,8 @@ const state = {
   activeQuestions: [],
   answers: new Map(),
   scores: new Map(),
+  codeResults: new Map(),
+  submitting: false,
   suggestions: [],
   questionSource: 'local',
   questionSourceMessage: '',
@@ -35,13 +37,91 @@ function questionPoints(question) {
   return question.points || (question.type === 'leetcode' ? 3 : question.type === 'short_answer' ? 2 : 1)
 }
 
+const QUESTION_RATINGS_KEY = 'java-expert-question-ratings'
+const REMOVED_QUESTIONS_KEY = 'java-expert-removed-questions'
+const QUESTION_RATING_LABELS = {
+  good: 'Good',
+  bad: 'Bad',
+  need_explanation: 'Need explanation',
+}
+
+function questionRatings() {
+  try {
+    const ratings = JSON.parse(localStorage.getItem(QUESTION_RATINGS_KEY) || '{}')
+    return ratings && typeof ratings === 'object' && !Array.isArray(ratings) ? ratings : {}
+  } catch {
+    return {}
+  }
+}
+
+function removedQuestionIds() {
+  try {
+    const ids = JSON.parse(localStorage.getItem(REMOVED_QUESTIONS_KEY) || '[]')
+    return Array.isArray(ids) ? ids : []
+  } catch {
+    return []
+  }
+}
+
+function ratingStatusText(rating) {
+  if (rating === 'good') return 'Marked good. It stays available for future quizzes.'
+  if (rating === 'bad') return 'Marked bad. It will be left out of future quizzes on this browser.'
+  if (rating === 'need_explanation') return 'Explanation requested. The result review will call this out.'
+  return 'No feedback selected.'
+}
+
+function questionRatingMarkup(question) {
+  const rating = questionRatings()[question.id] || ''
+  const buttons = Object.entries(QUESTION_RATING_LABELS).map(([value, label]) => `<button type="button" class="question-rating-button ${rating === value ? 'is-selected' : ''}" data-rating="${value}" data-question="${question.id}" aria-pressed="${rating === value}">${label}</button>`).join('')
+  return `<fieldset class="question-rating" data-rating-for="${question.id}"><legend>Question feedback</legend><p>Optional. Help improve this question for future practice.</p><div class="question-rating-actions">${buttons}</div><span class="question-rating-status" data-rating-status-for="${question.id}" role="status">${ratingStatusText(rating)}</span></fieldset>`
+}
+
+function updateQuestionRatingUI(questionId) {
+  const rating = questionRatings()[questionId] || ''
+  document.querySelectorAll(`[data-question-id="${questionId}"]`).forEach((card) => {
+    card.querySelectorAll('[data-rating]').forEach((button) => {
+      const selected = button.dataset.rating === rating
+      button.classList.toggle('is-selected', selected)
+      button.setAttribute('aria-pressed', String(selected))
+    })
+    const status = card.querySelector(`[data-rating-status-for="${questionId}"]`)
+    if (status) status.textContent = ratingStatusText(rating)
+    card.classList.toggle('has-question-feedback', Boolean(rating))
+  })
+}
+
+function setQuestionRating(questionId, rating) {
+  const ratings = questionRatings()
+  const nextRating = ratings[questionId] === rating ? '' : rating
+  if (nextRating) ratings[questionId] = nextRating
+  else delete ratings[questionId]
+  localStorage.setItem(QUESTION_RATINGS_KEY, JSON.stringify(ratings))
+
+  const removed = new Set(removedQuestionIds())
+  if (nextRating === 'bad') removed.add(questionId)
+  else removed.delete(questionId)
+  localStorage.setItem(REMOVED_QUESTIONS_KEY, JSON.stringify([...removed]))
+
+  updateQuestionRatingUI(questionId)
+  renderComposition()
+  const question = state.questions.find((item) => item.id === questionId)
+  if (nextRating === 'bad' && question) {
+    const available = state.questions.filter((item) => item.subjectId === question.subjectId && !removed.has(item.id)).length
+    byId('notification').hidden = false
+    byId('notification').textContent = `Question removed from future quizzes. ${available} questions remain for ${question.subjectTitle}; below 10, the bank needs a replacement question.`
+  }
+  if (state.submitted) renderResults()
+}
+
 function buildPool() {
   const selectedSubject = byId('subject-filter').value
   const category = byId('category-filter').value
   const type = byId('question-type').value
   const includeLeetcode = byId('include-leetcode').checked
   const subject = new URLSearchParams(window.location.search).get('subject')
+  const removed = new Set(removedQuestionIds())
   return state.questions.filter((question) => {
+    if (removed.has(question.id)) return false
     if ((selectedSubject !== 'all' && question.subjectId !== selectedSubject) || (selectedSubject === 'all' && subject && question.subjectId !== subject)) return false
     if (category !== 'all' && question.categoryId !== category) return false
     if (type !== 'mixed' && question.type !== type) return false
@@ -161,6 +241,16 @@ function codingMarkup(question, problem) {
   </section>`
 }
 
+function codingExampleResultsMarkup(examples) {
+  if (!Array.isArray(examples) || !examples.length) return ''
+  const rows = examples.map((example) => {
+    const actual = example.actual === null ? 'No result' : String(example.actual)
+    const status = example.passed ? 'Passed' : 'Wrong'
+    return `<article class="code-example-result ${example.passed ? 'passed' : 'failed'}"><div><strong>Example ${example.index}</strong><span class="example-status">${status}</span></div><p><b>Input:</b> <code>${escapeHtml(JSON.stringify(example.input))}</code></p><p><b>Expected:</b> ${escapeHtml(String(example.expected))}<br /><b>Your result:</b> ${escapeHtml(actual)}</p></article>`
+  }).join('')
+  return `<div class="code-example-results"><strong>Public example results</strong>${rows}</div>`
+}
+
 function renderQuestion(question, index) {
   const label = question.type === 'multiple_choice' ? 'Multiple-choice' : question.type === 'short_answer' ? 'Short answer' : 'LeetCode medium'
   const meta = `<div class="question-meta"><span>${String(index + 1).padStart(2, '0')}</span><span>${label}</span><span>${escapeHtml(question.subjectTitle)}</span><span>${escapeHtml(question.difficulty)}</span><span>${questionPoints(question)} points</span></div>`
@@ -213,6 +303,8 @@ function generateTest() {
   state.activeQuestions = selected.slice(0, count)
   state.answers = new Map()
   state.scores = new Map()
+  state.codeResults = new Map()
+  state.submitting = false
   state.submitted = false
   byId('quiz-form').innerHTML = state.activeQuestions.map(renderQuestion).join('')
   byId('quiz-section').hidden = false
@@ -236,6 +328,8 @@ function generateFixedTest() {
   state.activeQuestions = [...shortAnswers.slice(0, 10), coding]
   state.answers = new Map()
   state.scores = new Map()
+  state.codeResults = new Map()
+  state.submitting = false
   state.submitted = false
   byId('quiz-form').innerHTML = state.activeQuestions.map(renderQuestion).join('')
   byId('quiz-section').hidden = false
@@ -269,7 +363,9 @@ function revealFeedback(question, answer, score) {
     feedback.innerHTML = `<div class="reference"><strong>Reference answer</strong><p>${escapeHtml(question.referenceAnswer)}</p></div><div class="explanation"><strong>Rubric score: ${grade.score} / ${grade.max}</strong><p>${escapeHtml(question.explanation)}</p>${grade.matched.length ? `<p><b>Matched:</b> ${escapeHtml(grade.matched.join(', '))}</p>` : ''}${grade.missing.length ? `<p><b>Missing:</b> ${escapeHtml(grade.missing.join(', '))}</p>` : ''}</div>`
     return
   }
-  feedback.innerHTML = `<div class="reference"><strong>Reference approach</strong><p>${escapeHtml(question.referenceAnswer)}</p></div><div class="explanation"><strong>Why it matters</strong><p>${escapeHtml(question.explanation)}</p></div><div class="code-score-note"><strong>${score ? 'Code accepted' : 'Run the code to receive points'}</strong><span>LeetCode questions are scored by public and hidden tests in the runner.</span></div>`
+  const result = state.codeResults.get(question.id)
+  const status = result?.status === 'accepted' ? 'Code accepted' : result ? `${score} / ${questionPoints(question)} coding points` : 'Run the code to receive points'
+  feedback.innerHTML = `<div class="reference"><strong>Reference approach</strong><p>${escapeHtml(question.referenceAnswer)}</p></div><div class="explanation"><strong>Why it matters</strong><p>${escapeHtml(question.explanation)}</p></div><div class="code-score-note"><strong>${status}</strong><span>Public examples are visible; hidden tests remain private and contribute to the coding score.</span></div>`
 }
 
 function calculateScore() {
@@ -281,12 +377,44 @@ function correctAnswer(question) {
   return question.referenceAnswer || ''
 }
 
+function codingScore(result, maximum) {
+  if (!result) return 0
+  if (result.status === 'accepted') return maximum
+  if (result.status === 'compile_error' || result.status === 'runtime_error' || result.status === 'timeout') return 0
+  const examples = Array.isArray(result.examples) ? result.examples : []
+  const publicPassed = examples.filter((example) => example.passed).length
+  if (examples.length && publicPassed === examples.length && result.total > examples.length) return Math.max(1, maximum - 1)
+  return result.passed > 0 ? 1 : 0
+}
+
+function codingReviewMarkup(question) {
+  const result = state.codeResults.get(question.id)
+  if (!result) return '<div class="code-score-note"><strong>Code was not submitted</strong><span>Run examples, then submit the quiz to run public and hidden tests for points.</span></div>'
+  const label = result.mode === 'sample' && result.status === 'accepted'
+    ? 'Public examples passed'
+    : result.status === 'accepted'
+      ? 'Code accepted'
+      : 'Code needs review'
+  const points = result.mode === 'submit' ? codingScore(result, questionPoints(question)) : null
+  const pointsText = points === null ? '' : ` · ${points} / ${questionPoints(question)} coding points`
+  return `<div class="code-score-note"><strong>${label}</strong><span>${result.passed} / ${result.total} tests${pointsText} · ${escapeHtml(result.message)}</span></div>${codingExampleResultsMarkup(result.examples)}`
+}
+
 function reviewItemMarkup(question) {
   const score = state.scores.get(question.id) || 0
   const max = questionPoints(question)
   const status = score === max ? 'Correct' : score ? 'Partially correct' : 'Review this'
   const answerLabel = question.type === 'multiple_choice' ? 'Correct answer' : question.type === 'short_answer' ? 'Reference answer' : 'Reference approach'
-  return `<details class="review-item" open><summary><span class="review-label">${escapeHtml(status)} · ${escapeHtml(question.type === 'multiple_choice' ? 'Multiple-choice' : question.type === 'short_answer' ? 'Short answer' : 'Coding')} · ${escapeHtml(question.subjectTitle)}</span><strong>${escapeHtml(question.prompt)}</strong><span class="review-score">${score} / ${max} points</span></summary><div class="review-explanation"><p><b>${answerLabel}:</b> ${escapeHtml(correctAnswer(question))}</p><p><b>Explanation:</b> ${escapeHtml(question.explanation)}</p><p><b>Further reading:</b> <a href="${escapeHtml(question.source.url)}" target="_blank" rel="noreferrer">${escapeHtml(question.source.label)} ↗</a></p></div></details>`
+  const rating = questionRatings()[question.id] || ''
+  const ratingMarkup = rating === 'need_explanation'
+    ? `<div class="review-feedback"><strong>More explanation requested</strong><p>This question was flagged for clearer wording or a deeper explanation. The current answer, explanation, and source are included here for review.</p></div>`
+    : rating === 'bad'
+      ? '<div class="review-feedback"><strong>Removed from future quizzes</strong><p>This question will stay out of future quiz pools on this browser.</p></div>'
+      : rating === 'good'
+        ? '<div class="review-feedback"><strong>Marked good</strong><p>This question remains available for future practice.</p></div>'
+        : ''
+  const codeReview = question.type === 'leetcode' ? codingReviewMarkup(question) : ''
+  return `<details class="review-item" data-question-id="${question.id}" open><summary><span class="review-label">${escapeHtml(status)} · ${escapeHtml(question.type === 'multiple_choice' ? 'Multiple-choice' : question.type === 'short_answer' ? 'Short answer' : 'Coding')} · ${escapeHtml(question.subjectTitle)}</span><strong>${escapeHtml(question.prompt)}</strong><span class="review-score">${score} / ${max} points</span></summary><div class="review-explanation"><p><b>${answerLabel}:</b> ${escapeHtml(correctAnswer(question))}</p><div class="review-detail"><strong>Explanation</strong><p>${escapeHtml(question.explanation)}</p></div>${codeReview}${questionRatingMarkup(question)}${ratingMarkup}<p><b>Further reading:</b> <a href="${escapeHtml(question.source.url)}" target="_blank" rel="noreferrer">${escapeHtml(question.source.label)} ↗</a></p></div></details>`
 }
 
 function renderResults() {
@@ -302,10 +430,12 @@ function renderResults() {
   }, {})
   const subjectRows = Object.entries(bySubject).map(([subject, value]) => `<div class="result-row"><span>${escapeHtml(subject)}</span><strong>${value.score} / ${value.max} points</strong></div>`).join('')
   const reviewMarkup = `<section class="review-list"><h3>Review every answer and explanation</h3>${state.activeQuestions.map(reviewItemMarkup).join('')}</section>`
-  byId('results').innerHTML = `<div class="section-heading"><div><p class="eyebrow">04 / review</p><h2 id="results-title">Your result</h2></div><span class="pill">browser-local</span></div><div class="result-summary"><div class="score-number">${percent}%</div><div><p>${score} of ${maxPoints} points.</p><p class="microcopy">Every question includes its answer, explanation, and further-reading link. MCQs use exact answers, short answers use concept rubrics, and coding problems use runner tests.</p></div></div><div>${subjectRows}</div>${reviewMarkup}`
+  const requestedExplanations = state.activeQuestions.filter((question) => questionRatings()[question.id] === 'need_explanation').length
+  const feedbackSummary = requestedExplanations ? `<div class="feedback-summary"><strong>${requestedExplanations} explanation request${requestedExplanations === 1 ? '' : 's'} recorded</strong><p>The flagged review items include the current explanation and source so they can be improved in a future bank update.</p></div>` : ''
+  byId('results').innerHTML = `<div class="section-heading"><div><p class="eyebrow">04 / review</p><h2 id="results-title">Your result</h2></div><span class="pill">browser-local</span></div><div class="result-summary"><div class="score-number">${percent}%</div><div><p>${score} of ${maxPoints} points.</p><p class="microcopy">Every question includes its answer, explanation, and further-reading link. MCQs use exact answers, short answers use concept rubrics, and coding problems use runner tests.</p></div></div>${feedbackSummary}<div>${subjectRows}</div>${reviewMarkup}`
   byId('results').hidden = false
   byId('results').scrollIntoView({ behavior: 'smooth', block: 'start' })
-  localStorage.setItem('java-expert-last-result', JSON.stringify({ score, maxPoints, percent, at: new Date().toISOString() }))
+  localStorage.setItem('java-expert-last-result', JSON.stringify({ score, maxPoints, percent, at: new Date().toISOString(), ratings: Object.fromEntries(state.activeQuestions.map((question) => [question.id, questionRatings()[question.id] || null])) }))
 }
 
 function runnerUrl() {
@@ -327,12 +457,13 @@ async function runCode(questionId, mode, button) {
     const response = await fetch(`${base}/api/problems/${problem.id}/run`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ sourceCode: editor.value, mode }) })
     const payload = await response.json()
     if (!response.ok) throw new Error(payload.error || 'Runner request failed')
+    state.codeResults.set(questionId, { ...payload, mode })
     resultBox.className = `code-result ${payload.status}`
-    resultBox.innerHTML = `<strong>${escapeHtml(payload.message)}</strong><span>${payload.passed} / ${payload.total} tests · ${escapeHtml(payload.status)}</span>${payload.details ? `<pre>${escapeHtml(payload.details)}</pre>` : ''}`
+    resultBox.innerHTML = `<strong>${escapeHtml(payload.message)}</strong><span>${payload.passed} / ${payload.total} tests · ${escapeHtml(payload.status)}</span>${codingExampleResultsMarkup(payload.examples)}${payload.details ? `<pre>${escapeHtml(payload.details)}</pre>` : ''}`
     if (mode === 'submit') {
-      state.scores.set(question.id, payload.status === 'accepted' ? questionPoints(question) : 0)
+      state.scores.set(question.id, codingScore(payload, questionPoints(question)))
       revealFeedback(question, editor.value, state.scores.get(question.id))
-      if (state.submitted) renderResults()
+      if (state.submitted && !state.submitting) renderResults()
     }
   } catch (error) {
     resultBox.className = 'code-result error'
@@ -345,8 +476,17 @@ async function runCode(questionId, mode, button) {
 function bindEvents() {
   byId('generate-test').addEventListener('click', generateTest)
   byId('fixed-test').addEventListener('click', generateFixedTest)
-  byId('quiz-form').addEventListener('submit', (event) => {
+  byId('quiz-form').addEventListener('submit', async (event) => {
     event.preventDefault()
+    state.submitting = true
+    for (const question of state.activeQuestions.filter((item) => item.type === 'leetcode')) {
+      const previous = state.codeResults.get(question.id)
+      if (previous?.mode !== 'submit') {
+        const submitButton = document.querySelector(`[data-code-action="submit"][data-question="${question.id}"]`)
+        await runCode(question.id, 'submit', submitButton)
+      }
+    }
+    state.submitting = false
     state.submitted = true
     state.activeQuestions.forEach((question) => {
       const answer = readAnswer(question)
@@ -359,6 +499,11 @@ function bindEvents() {
   })
   ;['subject-filter', 'category-filter', 'question-type', 'question-count', 'include-leetcode'].forEach((id) => byId(id).addEventListener('input', renderComposition))
   byId('quiz-form').addEventListener('click', (event) => {
+    const ratingButton = event.target.closest('[data-rating]')
+    if (ratingButton) {
+      setQuestionRating(ratingButton.dataset.question, ratingButton.dataset.rating)
+      return
+    }
     const option = event.target.closest('[data-option]')
     if (option) {
       state.answers.set(option.dataset.question, option.dataset.option)
@@ -371,6 +516,10 @@ function bindEvents() {
     }
     const codeButton = event.target.closest('[data-code-action]')
     if (codeButton) runCode(codeButton.dataset.question, codeButton.dataset.codeAction, codeButton)
+  })
+  byId('results').addEventListener('click', (event) => {
+    const ratingButton = event.target.closest('[data-rating]')
+    if (ratingButton) setQuestionRating(ratingButton.dataset.question, ratingButton.dataset.rating)
   })
 }
 

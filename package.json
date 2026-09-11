@@ -5,6 +5,10 @@
   "description": "A small, source-backed Java interview quiz for the javexp subjects.",
   "scripts": {
     "test": "node --test tests/quiz-contract.test.js runner/tests/runner-contract.test.js",
-    "check": "npm test"
+    "check": "npm test",
+    "generate-bank": "python scripts/generate_question_bank.py",
+    "supabase-seed": "node scripts/seed_supabase.mjs",
+    "supabase-verify": "node scripts/verify_supabase.mjs",
+    "supabase-sql": "node scripts/run_supabase_sql.mjs"
   }
 }

@@ -249,5 +249,93 @@
       "label": "LeetCode 424",
       "url": "https://leetcode.com/problems/longest-repeating-character-replacement/"
     }
+  },
+  {
+    "id": "max-depth-binary-tree",
+    "title": "Maximum Depth of a Binary Tree",
+    "difficulty": "medium",
+    "problemId": "max-depth-binary-tree",
+    "methodSignature": "public int maxDepth(String levelOrder)",
+    "prompt": "Given a comma-separated level-order encoding of a binary tree, return its maximum depth. Null child positions are written as null.",
+    "constraints": [
+      "The encoding uses integer values and null tokens separated by commas.",
+      "An empty tree is represented by null."
+    ],
+    "starterCode": "class Solution {\n    public int maxDepth(String levelOrder) {\n        return 0;\n    }\n}",
+    "samples": [
+      { "input": "3,9,20,null,null,15,7", "expected": 3 },
+      { "input": "1", "expected": 1 }
+    ],
+    "points": 3,
+    "source": {
+      "label": "LeetCode 104",
+      "url": "https://leetcode.com/problems/maximum-depth-of-binary-tree/"
+    }
+  },
+  {
+    "id": "count-islands-grid",
+    "title": "Count Islands in a Grid",
+    "difficulty": "medium",
+    "problemId": "count-islands-grid",
+    "methodSignature": "public int numIslands(String grid)",
+    "prompt": "Rows are separated by slash characters and contain 1 for land or 0 for water. Return the number of four-directionally connected islands.",
+    "constraints": [
+      "Rows have equal width.",
+      "Only horizontal and vertical neighbors connect."
+    ],
+    "starterCode": "class Solution {\n    public int numIslands(String grid) {\n        return 0;\n    }\n}",
+    "samples": [
+      { "input": "11000/11000/00100/00011", "expected": 3 },
+      { "input": "11110/11010/11000/00000", "expected": 1 }
+    ],
+    "points": 3,
+    "source": {
+      "label": "LeetCode 200",
+      "url": "https://leetcode.com/problems/number-of-islands/"
+    }
+  },
+  {
+    "id": "count-balanced-parentheses",
+    "title": "Count Balanced Parentheses Sequences",
+    "difficulty": "medium",
+    "problemId": "count-balanced-parentheses",
+    "methodSignature": "public int countValidSequences(String n)",
+    "prompt": "Return how many balanced parenthesis strings can be formed with n pairs. The input is n as a decimal string.",
+    "constraints": [
+      "0 <= n <= 6.",
+      "A prefix may never contain more closing than opening parentheses."
+    ],
+    "starterCode": "class Solution {\n    public int countValidSequences(String n) {\n        return 0;\n    }\n}",
+    "samples": [
+      { "input": "3", "expected": 5 },
+      { "input": "1", "expected": 1 }
+    ],
+    "points": 3,
+    "source": {
+      "label": "Original recursion and backtracking exercise",
+      "url": "https://docs.oracle.com/en/java/javase/21/docs/api/"
+    }
+  },
+  {
+    "id": "minimum-coin-change",
+    "title": "Minimum Coin Change",
+    "difficulty": "medium",
+    "problemId": "minimum-coin-change",
+    "methodSignature": "public int minCoins(String encoded)",
+    "prompt": "The input is encoded as denominations separated by commas, followed by | and a target amount. Return the fewest coins needed, or -1 when the target is impossible.",
+    "constraints": [
+      "Denominations are positive integers.",
+      "Each denomination can be used any number of times."
+    ],
+    "starterCode": "class Solution {\n    public int minCoins(String encoded) {\n        return 0;\n    }\n}",
+    "samples": [
+      { "input": "1,2,5|11", "expected": 3 },
+      { "input": "2|3", "expected": -1 }
+    ],
+    "points": 3,
+    "source": {
+      "label": "Original dynamic programming exercise",
+      "url": "https://docs.oracle.com/en/java/javase/21/docs/api/"
+    }
   }
 ]
